@@ -19,6 +19,27 @@
 				</li>
 			</ul>
 		</div>
+
+		<div class="flash flash__success" v-if="flash.success">
+			{{ flash.success }}
+		</div>
+		<div class="flash flash__error" v-if="flash.error">
+			{{ flash.error }}
+		</div>
+
 		<router-view></router-view>
+
 	</div>
 </template>
+
+<script>
+import Flash from './helpers/flash.js'
+
+export default {
+  data() {
+	  return {
+			flash: Flash.state 
+	  }
+  }
+}
+</script>

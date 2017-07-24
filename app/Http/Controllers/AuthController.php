@@ -42,7 +42,7 @@ class AuthController extends Controller
 
         if($user && Hash::check($request->password, $user->password)) {
             $user->api_token = str_random(60);
-            $user-save();
+            $user->save();
             return response()->json([
                 'authenticated' => true,
                 'api_token' => $user->api_token,
