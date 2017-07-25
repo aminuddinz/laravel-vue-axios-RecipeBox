@@ -14,7 +14,7 @@
 				<!-- <li class="navbar__item" >
 					<router-link to="/recipes/create">CREATE RECIPE</router-link>
 				</li> -->
-				<li class="navbar__item" v-if="checkAuth">
+				<li class="navbar__item" v-if="checkAuth" style="cursor:pointer">
 					<a @click.stop="logout">LOGOUT</a>
 				</li>
 			</ul>

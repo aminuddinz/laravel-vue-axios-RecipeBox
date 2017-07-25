@@ -90,6 +90,9 @@ class RecipeController extends Controller
 
     public function show($id)
     {
+        $recipe = Recipe::with(['user', 'ingredients', 'directions'])
+                            ->findOrFail($id);
+
         return response()->json([
             'recipe' => $recipe
         ]);
