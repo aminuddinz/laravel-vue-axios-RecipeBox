@@ -98,7 +98,7 @@ class RecipeController extends Controller
         ]);
     }
 
-    public function edit($id) 
+    public function edit($id, Request $request) 
     {
         $form = $request->user()->recipes()
                     ->with(['ingredients' => function($query) {
@@ -106,7 +106,7 @@ class RecipeController extends Controller
                             }, 'directions' => function($query) {
                                 $query->get(['id','description']);
                     }])
-                    ->finOrFail($id, ['id','name','description','image']);
+                    ->findOrFail($id, ['id','name','description','image']);
 
         return response()->json([
             'form' => $form
@@ -118,7 +118,7 @@ class RecipeController extends Controller
         $this->validate($request, [
             'name' => 'required|max:255',
             'description' => 'required|max:3000',
-            'image' => 'required|image',
+            'image' => 'image',
             'ingredients' => 'required|array|min:1',
             'ingredients.*.id' => 'integer|exists:recipe_ingredients',
             'ingredients.*.name' => 'required|max:255',
@@ -128,7 +128,7 @@ class RecipeController extends Controller
             'directions.*.description' => 'required|max:3000'
         ]);
 
-        $recipe = $request->user()->recipes()->finOrFail($id);
+        $recipe = $request->user()->recipes()->findOrFail($id);
 
         $ingredients = [];
         $ingredientsUpdated = [];
@@ -200,7 +200,7 @@ class RecipeController extends Controller
 
     public function destroy($id, Request $request)
     {
-        $recipe = $request->user()->recipes()->finOrFail($id);
+        $recipe = $request->user()->recipes()->findOrFail($id);
 
         RecipeIngredient::where('recipe_id', $recipe->id)->delete();
         RecipeDirection::where('recipe_id', $recipe->id)->delete();
