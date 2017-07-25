@@ -1620,7 +1620,9 @@ module.exports = {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__helpers_flash_js__ = __webpack_require__("./resources/assets/js/helpers/flash.js");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__helpers_flash__ = __webpack_require__("./resources/assets/js/helpers/flash.js");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__store_auth__ = __webpack_require__("./resources/assets/js/store/auth.js");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__helpers_api__ = __webpack_require__("./resources/assets/js/helpers/api.js");
 //
 //
 //
@@ -1655,15 +1657,47 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+
+
+
 
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
-		data: function data() {
-				return {
-						flash: __WEBPACK_IMPORTED_MODULE_0__helpers_flash_js__["a" /* default */].state
-				};
+	created: function created() {
+		__WEBPACK_IMPORTED_MODULE_1__store_auth__["a" /* default */].initialize();
+	},
+	data: function data() {
+		return {
+			flash: __WEBPACK_IMPORTED_MODULE_0__helpers_flash__["a" /* default */].state, // state from helpers/flash.js
+			auth: __WEBPACK_IMPORTED_MODULE_1__store_auth__["a" /* default */].state // state from store/auth.js
+		};
+	},
+
+
+	computed: {
+		checkAuth: function checkAuth() {
+			if (this.auth.api_token && this.auth.user_id) {
+				return true;
+			}
+			return false;
 		}
+	},
+
+	methods: {
+		logout: function logout() {
+			var _this = this;
+
+			Object(__WEBPACK_IMPORTED_MODULE_2__helpers_api__["a" /* post */])('/api/logout').then(function (res) {
+				if (res.data.logged_out) {
+					__WEBPACK_IMPORTED_MODULE_1__store_auth__["a" /* default */].remove(); //remove data auth from local storage
+					__WEBPACK_IMPORTED_MODULE_0__helpers_flash__["a" /* default */].setSuccess('You have successfully logged out.'); // flash message
+					_this.$router.push('/login'); // redirect
+				}
+			});
+		}
+	}
+
 });
 
 /***/ }),
@@ -1673,8 +1707,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__helpers_flash_js__ = __webpack_require__("./resources/assets/js/helpers/flash.js");
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__helpers_api__ = __webpack_require__("./resources/assets/js/helpers/api.js");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__helpers_flash__ = __webpack_require__("./resources/assets/js/helpers/flash.js");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__store_auth__ = __webpack_require__("./resources/assets/js/store/auth.js");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__helpers_api__ = __webpack_require__("./resources/assets/js/helpers/api.js");
 //
 //
 //
@@ -1693,6 +1728,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+
 
 
 
@@ -1716,10 +1752,12 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
             this.isProcessing = true;
             this.error = {};
-            Object(__WEBPACK_IMPORTED_MODULE_1__helpers_api__["a" /* post */])('api/login', this.form).then(function (res) {
+            Object(__WEBPACK_IMPORTED_MODULE_2__helpers_api__["a" /* post */])('api/login', this.form).then(function (res) {
                 if (res.data.authenticated) {
-                    __WEBPACK_IMPORTED_MODULE_0__helpers_flash_js__["a" /* default */].setSuccess('You have successfully Logged In!');
-                    _this.$router.push('/');
+                    // set token
+                    __WEBPACK_IMPORTED_MODULE_1__store_auth__["a" /* default */].set(res.data.api_token, res.data.user_id); //store local storage
+                    __WEBPACK_IMPORTED_MODULE_0__helpers_flash__["a" /* default */].setSuccess('You have successfully logged in.'); // flash
+                    _this.$router.push('/'); // redirect
                 }
                 _this.isProcessing = false;
             }).catch(function (err) {
@@ -1739,7 +1777,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__helpers_flash_js__ = __webpack_require__("./resources/assets/js/helpers/flash.js");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__helpers_flash__ = __webpack_require__("./resources/assets/js/helpers/flash.js");
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__helpers_api__ = __webpack_require__("./resources/assets/js/helpers/api.js");
 //
 //
@@ -1795,7 +1833,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             this.error = {};
             Object(__WEBPACK_IMPORTED_MODULE_1__helpers_api__["a" /* post */])('api/register', this.form).then(function (res) {
                 if (res.data.registered) {
-                    __WEBPACK_IMPORTED_MODULE_0__helpers_flash_js__["a" /* default */].setSuccess('You have successfully create an Account!');
+                    __WEBPACK_IMPORTED_MODULE_0__helpers_flash__["a" /* default */].setSuccess('You have successfully create an Account!');
                     _this.$router.push('/login');
                 }
                 _this.isProcessing = false;
@@ -2352,25 +2390,19 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     }
   }, [_vm._v("Recipe Box")])], 1), _vm._v(" "), _c('ul', {
     staticClass: "navbar__list"
-  }, [_c('li', {
+  }, [(!_vm.checkAuth) ? _c('li', {
     staticClass: "navbar__item"
   }, [_c('router-link', {
     attrs: {
       "to": "/login"
     }
-  }, [_vm._v("LOGIN")])], 1), _vm._v(" "), _c('li', {
+  }, [_vm._v("LOGIN")])], 1) : _vm._e(), _vm._v(" "), (!_vm.checkAuth) ? _c('li', {
     staticClass: "navbar__item"
   }, [_c('router-link', {
     attrs: {
       "to": "/register"
     }
-  }, [_vm._v("REGISTER")])], 1), _vm._v(" "), _c('li', {
-    staticClass: "navbar__item"
-  }, [_c('router-link', {
-    attrs: {
-      "to": "/recipes/create"
-    }
-  }, [_vm._v("CREATE RECIPE")])], 1), _vm._v(" "), _c('li', {
+  }, [_vm._v("REGISTER")])], 1) : _vm._e(), _vm._v(" "), (_vm.checkAuth) ? _c('li', {
     staticClass: "navbar__item"
   }, [_c('a', {
     on: {
@@ -2379,7 +2411,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
         _vm.logout($event)
       }
     }
-  }, [_vm._v("LOGOUT")])])])]), _vm._v(" "), (_vm.flash.success) ? _c('div', {
+  }, [_vm._v("LOGOUT")])]) : _vm._e()])]), _vm._v(" "), (_vm.flash.success) ? _c('div', {
     staticClass: "flash flash__success"
   }, [_vm._v("\n\t\t" + _vm._s(_vm.flash.success) + "\n\t")]) : _vm._e(), _vm._v(" "), (_vm.flash.error) ? _c('div', {
     staticClass: "flash flash__error"
@@ -15106,6 +15138,9 @@ var app = new __WEBPACK_IMPORTED_MODULE_0_vue___default.a({
 /* harmony export (immutable) */ __webpack_exports__["a"] = post;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_axios__ = __webpack_require__("./node_modules/axios/index.js");
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_axios___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_axios__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__store_auth__ = __webpack_require__("./resources/assets/js/store/auth.js");
+
+
 
 
 function post(url, data) {
@@ -15114,7 +15149,10 @@ function post(url, data) {
 
         method: 'POST',
         url: url,
-        data: data
+        data: data,
+        headers: {
+            'Authorization': 'Bearer ' + __WEBPACK_IMPORTED_MODULE_1__store_auth__["a" /* default */].state.api_token
+        }
     });
 }
 
@@ -15179,6 +15217,34 @@ var router = new __WEBPACK_IMPORTED_MODULE_1_vue_router__["a" /* default */]({
 });
 
 /* harmony default export */ __webpack_exports__["a"] = (router);
+
+/***/ }),
+
+/***/ "./resources/assets/js/store/auth.js":
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony default export */ __webpack_exports__["a"] = ({
+
+    state: {
+        api_token: null,
+        user_id: null
+    },
+    initialize: function initialize() {
+        this.state.api_token = localStorage.getItem('api_token');
+        this.state.user_id = parseInt(localStorage.getItem('user_id'));
+    },
+    set: function set(api_token, user_id) {
+        localStorage.setItem('api_token', api_token);
+        localStorage.setItem('user_id', user_id);
+        this.initialize();
+    },
+    remove: function remove() {
+        localStorage.removeItem('api_token');
+        localStorage.removeItem('user_id');
+        this.initialize();
+    }
+});
 
 /***/ }),
 

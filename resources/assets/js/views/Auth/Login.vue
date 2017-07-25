@@ -1,5 +1,5 @@
 <template>
-    <form class="form" @submit.prevent="login">
+    <form class="form" @submit.prevent="login"> 
         <h1 class="form__title">Welcome Back!</h1>
         <div class="form__group">
             <label>Email</label>
@@ -18,7 +18,8 @@
 </template>
 <script type="text/javascript">
  
-    import Flash from '../../helpers/flash.js'
+    import Flash from '../../helpers/flash'
+    import Auth from '../../store/auth'
     import { post } from '../../helpers/api'
     
     export default {
@@ -39,8 +40,10 @@
                post('api/login', this.form)
                 .then( (res) => {
                     if(res.data.authenticated) {
-                        Flash.setSuccess('You have successfully Logged In!')
-                        this.$router.push('/')
+                        // set token
+                        Auth.set(res.data.api_token, res.data.user_id) //store local storage
+                        Flash.setSuccess('You have successfully logged in.') // flash
+                        this.$router.push('/') // redirect
                     }
                     this.isProcessing = false
                 })

@@ -27,7 +27,7 @@
 </template>
 <script type="text/javascript">
  
-    import Flash from '../../helpers/flash.js'
+    import Flash from '../../helpers/flash'
     import { post } from '../../helpers/api'
     
     export default {
