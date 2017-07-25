@@ -2885,9 +2885,6 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     }
   }, [_vm._v("\n                        Delete")]), _vm._v(" "), _c('button', {
     staticClass: "btn",
-    attrs: {
-      "disabled": _vm.isProcessing
-    },
     on: {
       "click": function($event) {
         _vm.$router.push('/')

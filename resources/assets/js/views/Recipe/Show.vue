@@ -19,7 +19,7 @@
                     </router-link>
                     <button class="btn btn__danger" @click="remove" :disabled="isRemoving">
                         Delete</button>
-                    <button class="btn" @click="$router.push('/')" :disabled="isProcessing">
+                    <button class="btn" @click="$router.push('/')">
                         Cancel</button>
                 </div>
             </div>
